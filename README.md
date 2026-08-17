@@ -195,11 +195,11 @@ Utilities for preparing the repository for public distribution.
 
 The sanitization process:
 
-Removes personal information
-Replaces private infrastructure details with example values
-Removes sensitive configuration
-Sanitizes service-specific paths and identifiers
-Provides safe replacements for files that cannot be published as-is
+- Removes personal information
+- Replaces private infrastructure details with example values
+- Removes sensitive configuration
+- Sanitizes service-specific paths and identifiers
+- Provides safe replacements for files that cannot be published as-is
 
 Sanitization is performed separately from the normal configuration export so the private infrastructure repository can retain its complete configuration while a sanitized copy can be published publicly.
 
@@ -283,6 +283,101 @@ This homelab is built around the following principles:
 - Disaster recovery planning
 - Reproducible deployments
 - Minimal manual intervention
+
+## Skills Demonstrated
+
+This project demonstrates practical experience designing, automating, documenting, and maintaining self-hosted infrastructure.
+
+### Infrastructure & Virtualization
+
+- Proxmox VE administration
+- LXC container management
+- Linux server administration
+- Infrastructure as Code (IaC) principles
+- Service isolation and infrastructure organization
+- Storage and mount management
+
+### Containerization
+
+- Docker and Docker Compose
+- Containerized application deployment
+- Persistent storage management
+- Container networking
+- Application stack organization
+- Docker host administration
+
+### Networking & Services
+
+- Reverse proxy configuration with Caddy
+- HTTPS and TLS management
+- Cloudflare integration
+- DNS filtering with AdGuard Home
+- Network file sharing with Samba
+- Service discovery and internal routing
+- Redundant infrastructure design
+
+### Automation & Scripting
+
+- Bash scripting
+- Shell automation
+- Automated configuration exports
+- Backup orchestration
+- Scheduled maintenance tasks
+- Error handling and exit status management
+- Logging and execution reporting
+- Configuration sanitization
+- Automated Git commits
+
+### Version Control & Configuration Management
+
+- Git-based infrastructure management
+- Configuration versioning
+- Change tracking and history
+- Sanitized public configuration exports
+- Reproducible configuration
+- Deployment templates
+- Infrastructure documentation alongside configuration
+
+### Backup & Disaster Recovery
+
+- Layered backup architecture
+- Proxmox VM/LXC backups
+- Application-specific backups
+- External backup replication
+- Offline backup strategy
+- Backup retention
+- Disaster recovery planning
+- Service restoration procedures
+- Separation of configuration backups and application data
+
+### Documentation
+
+- Infrastructure architecture documentation
+- Service-specific runbooks
+- Operational procedures
+- Disaster recovery documentation
+- Automated documentation generation
+- Configuration inventories
+- Maintenance procedures
+
+### Security Practices
+
+- Secret and credential sanitization
+- Separation of secrets from version-controlled configuration
+- Sanitized configuration templates
+- Least-exposure principles for internal services
+- Public repository hygiene
+- Backup separation and redundancy
+
+### Operational Practices
+
+- Production-style infrastructure management in a homelab environment
+- Automation-first workflows
+- Standardized service configuration
+- Monitoring and health checks
+- Reproducible deployments
+- Minimizing manual operational tasks
+- Treating infrastructure as maintainable software
 
 ## Backup Strategy
 
