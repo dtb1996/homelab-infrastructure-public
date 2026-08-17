@@ -4,10 +4,10 @@ set -euo pipefail
 #########################################
 # Backup Orchestrator
 #
-# Version: 1.5
+# Version: 1.6
 #########################################
 
-VERSION="1.5"
+VERSION="1.6"
 
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
@@ -170,7 +170,6 @@ run_backup \
     "HDD to USB backup mirror" \
     "$SCRIPT_DIR/mirror-backups.sh"
 
-
 #########################################
 # Generate Summary
 #########################################
@@ -185,7 +184,6 @@ if [ "$FAILED" -eq 0 ]; then
 else
     OVERALL_STATUS="failed"
 fi
-
 
 #########################################
 # JSON Summary
@@ -256,7 +254,6 @@ EOF
 
 } > "$SUMMARY_FILE"
 
-
 #########################################
 # Publish Backup Status
 #########################################
@@ -265,13 +262,11 @@ cp "$SUMMARY_FILE" "$STATUS_FILE"
 
 log "Published backup status: $STATUS_FILE"
 
-
 #########################################
 # Human-readable Summary
 #########################################
 
 write_backup_summary "$REPORT_FILE"
-
 
 #########################################
 # Log Summary

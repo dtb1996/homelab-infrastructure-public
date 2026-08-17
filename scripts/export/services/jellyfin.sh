@@ -146,5 +146,4 @@ The README is regenerated during each configuration export.
 EOF
 
     record_status "jellyfin" "OK"
-
 }

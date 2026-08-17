@@ -247,8 +247,6 @@ pct list
 pct status 131
 ```
 
----
-
 ### 2. Verify Docker Engine
 
 Confirm Docker Engine is installed and operational.
@@ -257,8 +255,6 @@ Confirm Docker Engine is installed and operational.
 docker version
 docker ps
 ```
-
----
 
 ### 3. Restore the Docker Compose Project
 
@@ -282,8 +278,6 @@ Expected contents include:
 - `.env`
 - `postgres/`
 
----
-
 ### 4. Restore the PostgreSQL Database
 
 If restoring from a separate backup, restore the PostgreSQL data directory.
@@ -306,8 +300,6 @@ Expected contents include:
 - `base/`
 - `global/`
 - `pg_wal/`
-
----
 
 ### 5. Verify Photo Storage
 
@@ -336,8 +328,6 @@ The `/photos` directory should contain folders similar to:
 
 Docker automatically bind mounts `/photos` into the Immich container as `/data`.
 
----
-
 ### 6. Deploy the Stack
 
 Navigate to the Compose project:
@@ -365,8 +355,6 @@ Expected containers:
 - `immich_postgres`
 - `immich_machine_learning`
 - `immich_redis`
-
----
 
 ### 7. Validate the Service
 

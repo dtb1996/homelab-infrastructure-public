@@ -165,7 +165,6 @@ Example:
 
 ```caddy
 homepage.example.com {
-
     import security
 
     reverse_proxy 192.0.2.20:3000
@@ -211,7 +210,6 @@ Example:
 
 ```caddy
 example.example.com {
-
     import security
 
     reverse_proxy 192.0.2.92:8080

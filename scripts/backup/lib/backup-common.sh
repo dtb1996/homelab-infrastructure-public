@@ -12,7 +12,6 @@ export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 LIB_VERSION="1.1"
 
-
 #########################################
 # Logging
 #########################################
@@ -26,7 +25,6 @@ log() {
         echo "$msg"
     fi
 }
-
 
 #########################################
 # Error Handling
@@ -45,7 +43,6 @@ setup_error_handler() {
     trap 'backup_error_handler $LINENO "$BASH_COMMAND"' ERR
 }
 
-
 #########################################
 # Backup Header
 #########################################
@@ -58,7 +55,6 @@ backup_header() {
     log "Version: ${VERSION}"
 }
 
-
 #########################################
 # Backup Footer
 #########################################
@@ -67,7 +63,6 @@ backup_footer() {
     log "Backup completed successfully"
     echo >> "$LOGFILE"
 }
-
 
 #########################################
 # README Generator
@@ -111,7 +106,6 @@ EOF
 
 }
 
-
 #########################################
 # Create Latest Symlink
 #########################################
@@ -124,7 +118,6 @@ create_latest_symlink() {
     ln -sfn "$source" "$link"
 
 }
-
 
 #########################################
 # Rotate Backups
@@ -143,7 +136,6 @@ rotate_backups() {
 
 }
 
-
 #########################################
 # Rotate Inventory Directories
 #########################################
@@ -161,7 +153,6 @@ rotate_inventory() {
 
 }
 
-
 #########################################
 # Checksum Generator
 #########################################
@@ -173,7 +164,6 @@ calculate_checksum() {
     sha256sum "$file" > "$file.sha256"
 
 }
-
 
 #########################################
 # Inventory Directory
@@ -192,7 +182,6 @@ create_inventory() {
     mkdir -p "$INV"
 
 }
-
 
 #########################################
 # Write Backup Summary

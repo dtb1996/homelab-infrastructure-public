@@ -4,7 +4,7 @@ set -euo pipefail
 #########################################
 # Proxmox Host Backup
 #
-# Version: 2.3
+# Version: 2.4
 #
 # Backs up:
 #   - Proxmox host configuration
@@ -12,11 +12,9 @@ set -euo pipefail
 #   - System inventory
 #   - SHA256 checksums
 #
-# Retention:
-#   - 90 days
 #########################################
 
-VERSION="2.3"
+VERSION="2.4"
 RETENTION_DAYS=90
 
 START=$(date +%s)

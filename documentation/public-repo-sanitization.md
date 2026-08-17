@@ -65,19 +65,3 @@ grep -RniE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' .
 ```bash
 grep -RniE '\.(com|net|org|home|local)\b' .
 ```
-
-## Initial Copy and Clear Git History
-
-```bash
-cp -r homelab-infrastructure homelab-infrastructure-public
-
-cd homelab-infrastructure-public
-
-rm -rf .git
-
-git init
-
-git add .
-
-git commit -m "Initial public release"
-```

@@ -272,7 +272,7 @@ docker version
 
 Restore:
 
-```
+```text
 /opt/stacks
 ```
 

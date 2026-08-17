@@ -5,19 +5,16 @@ set -euo pipefail
 #
 # Raspberry Pi Backup Pull
 #
-# Version: 1.1
+# Version: 1.2
 #
 # Pulls:
 # - Raspberry Pi configuration backups
 # - Inventories
 # - Checksums
 #
-# Retention:
-# - 30 days
-#
 #########################################
 
-VERSION="1.1"
+VERSION="1.2"
 RETENTION_DAYS=30
 
 BASE="/srv/backups/raspberrypi"

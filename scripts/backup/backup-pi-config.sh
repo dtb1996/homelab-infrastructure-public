@@ -4,7 +4,7 @@ set -euo pipefail
 #########################################
 # Raspberry Pi Configuration Backup
 #
-# Version: 2.2
+# Version: 2.3
 #
 # Managed by the Homelab Git repository.
 #
@@ -17,7 +17,7 @@ set -euo pipefail
 # Local changes may be overwritten.
 #########################################
 
-VERSION="2.2"
+VERSION="2.3"
 RETENTION_DAYS=14
 
 START=$(date +%s)
@@ -50,7 +50,6 @@ setup_error_handler
 
 backup_header "Raspberry Pi Configuration"
 
-
 #########################################
 # Diagnostics
 #########################################
@@ -78,7 +77,6 @@ fi
 
 log "Running as PID $$"
 id | tee -a "$LOGFILE"
-
 
 #########################################
 # Create Configuration Archive
@@ -137,7 +135,6 @@ ARCHIVE_SIZE=$(du -h "$ARCHIVE" | cut -f1)
 log "Archive: $(basename "$ARCHIVE")"
 log "Archive size: $ARCHIVE_SIZE"
 
-
 #########################################
 # Docker Volume Backup
 #########################################
@@ -184,7 +181,6 @@ else
     log "Docker not installed, skipping volume backup"
 fi
 
-
 #########################################
 # Collect Inventory
 #########################################
@@ -195,12 +191,10 @@ mkdir -p "$INV"
 
 log "Collecting inventory..."
 
-
 hostnamectl > "$INV/hostnamectl.txt" 2>/dev/null || true
 uname -a > "$INV/uname.txt"
 
 cat /etc/os-release > "$INV/os-release.txt"
-
 
 lsblk -f > "$INV/lsblk.txt"
 blkid > "$INV/blkid.txt"
@@ -210,23 +204,18 @@ df -h > "$INV/df.txt"
 
 free -h > "$INV/memory.txt"
 
-
 ip addr > "$INV/ip-addr.txt"
 ip route > "$INV/ip-route.txt"
-
 
 systemctl list-unit-files > "$INV/systemd-unit-files.txt"
 systemctl list-units > "$INV/systemd-running.txt"
 systemctl list-timers --all > "$INV/systemd-timers.txt"
 
-
 crontab -l > "$INV/crontab.txt" 2>/dev/null || true
-
 
 apt-mark showmanual > "$INV/manual-packages.txt"
 
 dpkg --get-selections > "$INV/packages.txt"
-
 
 #########################################
 # Docker Inventory
@@ -274,7 +263,6 @@ if command -v docker >/dev/null 2>&1; then
 
 fi
 
-
 #########################################
 # Service Inventory
 #########################################
@@ -296,7 +284,6 @@ if command -v vcgencmd >/dev/null 2>&1; then
 
 fi
 
-
 #########################################
 # AdGuard Home Inventory
 #########################################
@@ -308,7 +295,6 @@ if [ -x "/opt/AdGuardHome/AdGuardHome" ]; then
 
 fi
 
-
 #########################################
 # Important System Files
 #########################################
@@ -316,7 +302,6 @@ fi
 cp /etc/fstab "$INV/" || true
 cp /etc/hosts "$INV/" || true
 cp /etc/hostname "$INV/" || true
-
 
 #########################################
 # Inventory README
@@ -360,9 +345,7 @@ Included:
 
 EOF
 
-
 log "Inventory complete"
-
 
 #########################################
 # Update latest symlinks
@@ -373,7 +356,6 @@ create_latest_symlink "$ARCHIVE.sha256" "$LATEST_DIR/raspberrypi-config-latest.t
 create_latest_symlink "$INV" "$LATEST_DIR/inventory"
 
 log "Updated latest links"
-
 
 #########################################
 # Cleanup
@@ -395,7 +377,6 @@ END=$(date +%s)
 ELAPSED=$((END - START))
 
 log "Completed in ${ELAPSED}s"
-
 
 #########################################
 # Footer

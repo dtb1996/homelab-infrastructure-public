@@ -4,18 +4,16 @@ set -euo pipefail
 #########################################
 # Docker Configuration Backup
 #
-# Version: 1.1
+# Version: 1.2
 #
 # Backs up:
 #   - Docker Compose stacks
 #   - Portainer data
 #   - Docker inventories
 #
-# Retention:
-#   - 90 days
 #########################################
 
-VERSION="1.1"
+VERSION="1.2"
 RETENTION_DAYS=90
 
 BASE="/srv/backups/docker"

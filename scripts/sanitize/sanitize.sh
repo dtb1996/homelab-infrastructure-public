@@ -5,7 +5,7 @@ set -euo pipefail
 #
 # Homelab Public Repository Sanitizer
 #
-# Version: 1.1
+# Version: 1.2
 #
 # Copies the private homelab repository
 # to a separate public repository directory
@@ -19,7 +19,7 @@ set -euo pipefail
 #
 #########################################
 
-VERSION="1.1"
+VERSION="1.2"
 
 #########################################
 # Configuration
@@ -197,6 +197,55 @@ for PATH_TO_REMOVE in "${PRIVATE_PATHS[@]}"; do
     fi
 
 done
+
+#########################################
+# Add Public Repository Notice
+#########################################
+
+log "Adding public repository notice..."
+
+PUBLIC_README="$PUBLIC_DIR/README.md"
+
+if [[ -f "$PUBLIC_README" ]]; then
+
+    if ! grep -qF '> **Note**' "$PUBLIC_README"; then
+
+        TEMP_README="$(mktemp)"
+
+        awk '
+        /^## / && !inserted {
+            print "> **Note**"
+            print ">"
+            print "> This repository is a sanitized version of my production homelab."
+            print "> Sensitive information such as domains, IP addresses, credentials,"
+            print "> and personal identifiers have been replaced with example values."
+            print ""
+            inserted = 1
+        }
+        { print }
+        END {
+            if (!inserted) {
+                print ""
+                print "> **Note**"
+                print ">"
+                print "> This repository is a sanitized version of my production homelab."
+                print "> Sensitive information such as domains, IP addresses, credentials,"
+                print "> and personal identifiers have been replaced with example values."
+            }
+        }
+        ' "$PUBLIC_README" > "$TEMP_README"
+
+        mv "$TEMP_README" "$PUBLIC_README"
+
+        log "Added public repository notice."
+
+    else
+        log "Public repository notice already present."
+    fi
+
+else
+    log "WARNING: Public README not found; skipping public repository notice."
+fi
 
 #########################################
 # Replacement functions
