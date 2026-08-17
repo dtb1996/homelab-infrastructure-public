@@ -4,6 +4,12 @@ This repository serves as the **Infrastructure as Code (IaC)** source for my sel
 
 The goal is to treat the homelab like production infrastructure by version controlling configuration, documenting architecture, and automating routine operations wherever possible.
 
+> **Note**
+>
+> This repository is a sanitized version of my production homelab.
+> Sensitive information such as domains, IP addresses, credentials,
+> and personal identifiers have been replaced with example values.
+
 ## Homelab Overview
 
 ### Platform
