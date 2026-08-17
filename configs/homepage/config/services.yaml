@@ -1,0 +1,76 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/services/
+
+- Media:
+    - Jellyfin:
+        icon: jellyfin.svg
+        href: https://jellyfin.example.com
+        description: Media server
+    - Plex:
+        icon: plex.svg
+        href: https://plex.example.com
+        description: Media server
+    - Immich:
+        icon: immich.svg
+        href: https://photos.example.com
+        description: Media server
+
+- Infrastructure:
+    - Proxmox:
+        icon: proxmox.svg
+        href: https://proxmox.example.com
+        description: Virtualization host
+        widget:
+            type: proxmox
+            url: https://192.0.2.10:8006
+            username: "{{HOMEPAGE_VAR_PROXMOX_TOKEN}}"
+            password: "{{HOMEPAGE_VAR_PROXMOX_SECRET}}"
+            node: proxmox
+    - Portainer:
+        icon: portainer.svg
+        href: https://portainer.example.com
+        description: Portainer management for Docker LXC
+    - Home Assistant:
+        icon: home-assistant.svg
+        href: https://ha.example.com
+        description: Home automation
+    - Router:
+        icon: tp-link.svg
+        href: http://router.example.com
+        description: Router management
+
+- Storage:
+    - Paperless:
+        icon: paperless.svg
+        href: https://paperless.example.com
+        description: Document management
+    - Syncthing:
+        icon: syncthing.svg
+        href: https://sync.example.com
+        description: Syncthing Web UI
+        widget:
+            type: syncthing
+            url: https://sync.example.com
+            key: "{{HOMEPAGE_VAR_SYNCTHING_API_KEY}}"
+
+- Monitoring:
+    - Uptime Kuma:
+        icon: uptime-kuma.svg
+        href: https://status.example.com
+        description: Homelab status monitor
+        widget:
+            type: uptimekuma
+            url: https://status.example.com
+            slug: homelab
+
+- Network:
+  - AdGuard (Proxmox):
+      icon: adguard-home.svg
+      href: https://adguard.example.com
+      description: Primary DNS
+
+  - AdGuard (Raspberry Pi):
+      icon: adguard-home.svg
+      href: https://adguard-pi.example.com
+      description: Secondary DNS

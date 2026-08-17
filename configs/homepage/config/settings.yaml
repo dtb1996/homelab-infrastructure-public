@@ -1,0 +1,14 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/settings/
+
+title: Dillon's Homelab
+
+providers:
+  openweathermap: openweathermapapikey
+  weatherapi: weatherapiapikey
+
+allowedHosts:
+  - homepage.example.com
+  - localhost
+  - 192.0.2.0/24

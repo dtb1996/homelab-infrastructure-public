@@ -1,0 +1,7 @@
+containerd.io					install
+docker-buildx-plugin				install
+docker-ce					install
+docker-ce-cli					install
+docker-ce-rootless-extras			install
+docker-compose-plugin				install
+docker-model-plugin				install

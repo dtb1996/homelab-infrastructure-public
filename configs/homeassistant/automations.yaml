@@ -1,0 +1,26 @@
+- id: '1784508151560'
+  alias: View Assist - How's the Weather?
+  description: ''
+  use_blueprint:
+    path: dinki/blueprint-howstheweather.yaml
+    input:
+      weather_entity: weather.forecast_home
+- id: '1785204190186'
+  alias: Backup Failed
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.homelab_backup_status
+    to:
+    - failed
+  actions:
+  - action: notify.notify
+    data:
+      title: Backup Failed
+      message: 'The homelab backup failed.
+
+        Failed jobs: {{ state_attr(''sensor.homelab_backup_status'',''failed_jobs'')
+        }}
+
+        '
+  mode: single

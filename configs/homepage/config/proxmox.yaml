@@ -1,0 +1,6 @@
+---
+ pve:
+   url: https://192.0.2.10:8006
+   token: <REDACTED>
+   secret: <REDACTED>
+

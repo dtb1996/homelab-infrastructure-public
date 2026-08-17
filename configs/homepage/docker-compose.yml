@@ -1,0 +1,15 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    ports:
+      - 3000:3000
+    environment:
+      - HOMEPAGE_ALLOWED_HOSTS=192.0.2.20:3000,homepage.local,homepage.example.com
+      - HOMEPAGE_VAR_PROXMOX_TOKEN=${HOMEPAGE_VAR_PROXMOX_TOKEN}
+      - HOMEPAGE_VAR_PROXMOX_SECRET=${HOMEPAGE_VAR_PROXMOX_SECRET}
+      - HOMEPAGE_VAR_SYNCTHING_API_KEY=${HOMEPAGE_VAR_SYNCTHING_API_KEY}
+    volumes:
+      - ./config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped

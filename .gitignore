@@ -1,0 +1,39 @@
+# Logs
+*.log
+logs/
+
+# Backup archives
+*.tar.gz
+*.zip
+*.img
+
+# Temporary files
+*.tmp
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Secret files
+**/secrets/
+**/*secret*
+**/*password*
+**/*token*
+**/*.key
+**/*.pem
+
+# Backups
+**/archives/
+**/databases/
+
+# Jellyfin runtime files
+configs/jellyfin/config/cache/
+configs/jellyfin/config/log/
+configs/jellyfin/config/transcodes/
+configs/jellyfin/config/data/

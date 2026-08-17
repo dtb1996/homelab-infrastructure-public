@@ -1,0 +1,84 @@
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 192.0.2.40
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+sensor:
+  - platform: rest
+    name: Backup Status
+    resource: https://backup.example.com/latest.json
+    scan_interval: 300
+    value_template: "{{ value_json.status }}"
+    json_attributes:
+      - backup_version
+      - hostname
+      - started
+      - completed
+      - duration_seconds
+      - jobs
+      - failed_jobs
+
+template:
+  - sensor:
+      - name: "Last Backup"
+        state: >
+          {{ state_attr('sensor.homelab_backup_status', 'completed') | default('Unknown') }}
+
+      - name: "Backup Duration"
+        unit_of_measurement: "s"
+        state: >
+          {{ state_attr('sensor.homelab_backup_status', 'duration_seconds') | default(0) }}
+
+      - name: "Failed Backup Jobs"
+        state: >
+          {{ state_attr('sensor.homelab_backup_status', 'failed_jobs') | default([]) | length }}
+
+      - name: "Backup Health"
+        icon: >
+          {% if states('sensor.homelab_backup_status') == 'success' %}
+            mdi:backup-restore
+          {% else %}
+            mdi:alert-circle
+          {% endif %}
+        state: >
+          {% if states('sensor.homelab_backup_status') == 'success' %}
+            Healthy
+          {% else %}
+            Failed
+          {% endif %}
+
+template:
+  - sensor:
+
+      - name: "Backup Proxmox Status"
+        state: >
+          {{ state_attr('sensor.homelab_backup_status','jobs')['Proxmox configuration backup']['status'] }}
+
+      - name: "Backup Docker Status"
+        state: >
+          {{ state_attr('sensor.homelab_backup_status','jobs')['Docker configuration backup']['status'] }}
+
+      - name: "Backup Home Assistant Status"
+        state: >
+          {{ state_attr('sensor.homelab_backup_status','jobs')['Home Assistant backup']['status'] }}
+
+      - name: "Backup Paperless Status"
+        state: >
+          {{ state_attr('sensor.homelab_backup_status','jobs')['Paperless backup']['status'] }}
+
+      - name: "Backup Raspberry Pi Status"
+        state: >
+          {{ state_attr('sensor.homelab_backup_status','jobs')['Raspberry Pi backup']['status'] }}
+

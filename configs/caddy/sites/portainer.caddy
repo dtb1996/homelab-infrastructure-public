@@ -1,0 +1,9 @@
+portainer.example.com {
+    import security
+
+    reverse_proxy https://192.0.2.20:9443 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+    }
+}

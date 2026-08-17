@@ -1,0 +1,5 @@
+router.example.com {
+    import security
+
+    reverse_proxy http://192.0.2.1
+}

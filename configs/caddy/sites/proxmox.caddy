@@ -1,0 +1,9 @@
+proxmox.example.com {
+    import security
+
+    reverse_proxy 192.0.2.10:8006 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+    }
+}
