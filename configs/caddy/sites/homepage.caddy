@@ -1,5 +1,4 @@
 homepage.example.com {
-
     import security
 
     reverse_proxy 192.0.2.20:3000

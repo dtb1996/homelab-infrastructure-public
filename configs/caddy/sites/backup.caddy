@@ -1,5 +1,4 @@
 backup.example.com {
-
     root * /mnt/backups
 
     @json path *.json

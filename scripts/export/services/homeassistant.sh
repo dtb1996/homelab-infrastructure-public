@@ -37,23 +37,6 @@ sync_homeassistant() {
     | tar -C "$DEST" -xf -
 
     #########################################
-    # Create secrets template
-    #########################################
-    cat > "$DEST/secrets.yaml.example" <<EOF
-# Home Assistant secrets template
-#
-# Copy this file to:
-# /opt/homeassistant/config/secrets.yaml
-#
-# Then replace values with real secrets.
-
-# Example:
-# mqtt_username: CHANGE_ME
-# mqtt_password: CHANGE_ME
-# api_key: CHANGE_ME
-EOF
-
-    #########################################
     # Generate README
     #########################################
 
@@ -84,9 +67,7 @@ The following configuration is exported to Git:
 - \`scripts.yaml\`
 - \`scenes.yaml\`
 - \`blueprints/\`
-- \`custom_components/\`
 - \`www/\`
-- \`secrets.yaml.example\`
 
 The exported configuration provides a sanitized representation of the
 Home Assistant setup without including instance-specific runtime data
@@ -108,18 +89,11 @@ Runtime data is protected separately by the homelab backup strategy.
 
 ## Secrets
 
-\`secrets.yaml\` is intentionally excluded from Git.
+Home Assistant does not currently use a \`secrets.yaml\` file in this
+deployment.
 
-A sanitized template is provided as:
-
-\`\`\`
-secrets.yaml.example
-\`\`\`
-
-Copy the template to the Home Assistant configuration directory and
-replace the example values with the required secrets before deployment.
-
-Secrets should never be committed to Git.
+If secrets are introduced in the future, they should be stored outside
+Git and represented by a sanitized template when appropriate.
 
 ## Backup
 
