@@ -58,6 +58,24 @@ if ! check_dependencies; then
 fi
 
 #########################################
+# Prepare Export Directory
+#########################################
+
+CONFIGS_DIR="$REPO_DIR/configs"
+
+if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[DRY RUN] Would clear configuration export directory:"
+    echo "$CONFIGS_DIR"
+else
+    echo "Clearing configuration export directory..."
+    echo "Export directory: $CONFIGS_DIR"
+
+    mkdir -p "$CONFIGS_DIR"
+
+    find "$CONFIGS_DIR" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+fi
+
+#########################################
 # Service Exporters
 #########################################
 
