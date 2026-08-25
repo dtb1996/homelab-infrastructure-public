@@ -97,25 +97,35 @@ source "$SCRIPT_DIR/services/syncthing.sh"
 # Run Exports
 #########################################
 
-sync_proxmox
-sync_caddy
-sync_homepage
-sync_paperless
-sync_immich
-sync_docker
-sync_portainer
-sync_samba
-sync_adguard
-sync_homeassistant
-sync_jellyfin
-sync_plex
-sync_syncthing
+export_failed=false
 
-#########################################
-# Git Commit
-#########################################
+run_sync() {
+    local service="$1"
 
-git_commit_changes
+    echo
+    echo "----------------------------------------"
+    echo "Running: $service"
+    echo "----------------------------------------"
+
+    if ! "$service"; then
+        echo "ERROR: $service failed."
+        export_failed=true
+    fi
+}
+
+run_sync sync_proxmox
+run_sync sync_caddy
+run_sync sync_homepage
+run_sync sync_paperless
+run_sync sync_immich
+run_sync sync_docker
+run_sync sync_portainer
+run_sync sync_samba
+run_sync sync_adguard
+run_sync sync_homeassistant
+run_sync sync_jellyfin
+run_sync sync_plex
+run_sync sync_syncthing
 
 #########################################
 # Summary
@@ -129,6 +139,28 @@ echo "================================="
 for result in "${SYNC_RESULTS[@]}"; do
     echo "$result"
 done
+
+#########################################
+# Check Export Result
+#########################################
+
+if [[ "$export_failed" == "true" ]]; then
+    echo
+    echo "One or more configuration exports failed."
+    echo "Git commit skipped."
+
+    exit 1
+fi
+
+#########################################
+# Git Commit
+#########################################
+
+git_commit_changes
+
+#########################################
+# Git Status
+#########################################
 
 cd "$REPO_DIR"
 

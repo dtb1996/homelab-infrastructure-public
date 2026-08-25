@@ -2,27 +2,106 @@
 # Plex
 #########################################
 
+PLEX_ENABLED=false
+PLEX_DISABLED_REASON="Plex is no longer actively used."
+
 sync_plex() {
     local DEST="$REPO_DIR/configs/plex"
 
     echo "Syncing Plex config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$PLEX_ENABLED" != "true" ]]; then
+        echo "Plex export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# Plex Configuration
+
+## Status
+
+Plex configuration export is currently **disabled**.
+
+**Reason:** $PLEX_DISABLED_REASON
+
+No live Plex configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+PLEX_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/plex.sh
+\`\`\`
+
+EOF
+
+        record_status "plex" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would copy Plex configuration"
         record_status "plex" "DRY"
-        return
+        return 0
     fi
 
-    mkdir -p "$DEST"
+    #########################################
+    # Container Check
+    #########################################
 
-    # Capture Plex service configuration summary
-    pct exec 102 -- systemctl cat plexmediaserver \
-        > "$DEST/service-info.txt"
+    if ! is_lxc_running 102; then
+        echo "ERROR: Plex container CT102 is not running."
+        record_status "plex" "FAILED"
+        return 1
+    fi
 
-    # Capture media library paths
-    pct exec 102 -- bash -c \
+    #########################################
+    # Prepare Destination
+    #########################################
+
+    if ! mkdir -p "$DEST"; then
+        echo "ERROR: Failed to create Plex export directory."
+        record_status "plex" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Capture Service Configuration
+    #########################################
+
+    if ! pct exec 102 -- systemctl cat plexmediaserver \
+        > "$DEST/service-info.txt"; then
+
+        echo "ERROR: Failed to export Plex service configuration."
+        record_status "plex" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Capture Media Library Paths
+    #########################################
+
+    if ! pct exec 102 -- bash -c \
         'find /media -maxdepth 2 -type d | sort' \
-        > "$DEST/libraries.txt"
+        > "$DEST/libraries.txt"; then
+
+        echo "ERROR: Failed to export Plex library paths."
+        record_status "plex" "FAILED"
+        return 1
+    fi
 
     #########################################
     # Generate README
@@ -97,8 +176,7 @@ The actual media files are not stored in Git.
 
 The Plex LXC is protected by the normal Proxmox backup process.
 
-Media storage is protected separately by the homelab storage and backup
-strategy.
+Media storage is protected separately by the homelab backup process.
 
 The exported Plex configuration is also tracked in the homelab Git
 repository.
@@ -115,5 +193,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "plex" "OK"
+    echo "Plex configuration exported successfully."
+
+    return 0
 }

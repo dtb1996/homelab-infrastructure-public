@@ -24,6 +24,7 @@ The following configuration is exported to Git:
 - `scripts.yaml`
 - `scenes.yaml`
 - `blueprints/`
+- `custom_components/`
 - `www/`
 
 The exported configuration provides a sanitized representation of the

@@ -2,39 +2,117 @@
 # Syncthing
 #########################################
 
+SYNCTHING_ENABLED=true
+SYNCTHING_DISABLED_REASON=""
+
 sync_syncthing() {
     local DEST="$REPO_DIR/configs/syncthing"
 
     echo "Syncing Syncthing config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$SYNCTHING_ENABLED" != "true" ]]; then
+        echo "Syncthing export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# Syncthing Configuration
+
+## Status
+
+Syncthing configuration export is currently **disabled**.
+
+**Reason:** $SYNCTHING_DISABLED_REASON
+
+No live Syncthing configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+SYNCTHING_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/syncthing.sh
+\`\`\`
+
+EOF
+
+        record_status "syncthing" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would export Syncthing configuration summary"
         record_status "syncthing" "DRY"
-        return
+        return 0
     fi
 
-    mkdir -p "$DEST"
+    #########################################
+    # Container Check
+    #########################################
+
+    if ! is_lxc_running 121; then
+        echo "ERROR: Syncthing container CT121 is not running."
+        record_status "syncthing" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Prepare Destination
+    #########################################
+
+    if ! mkdir -p "$DEST"; then
+        echo "ERROR: Failed to create Syncthing export directory."
+        record_status "syncthing" "FAILED"
+        return 1
+    fi
 
     #########################################
     # Service Information
     #########################################
 
-    pct exec 121 -- systemctl cat syncthing@syncthing.service \
-        > "$DEST/service-info.txt"
+    if ! pct exec 121 -- systemctl cat syncthing@syncthing.service \
+        > "$DEST/service-info.txt"; then
+
+        echo "ERROR: Failed to export Syncthing service information."
+        record_status "syncthing" "FAILED"
+        return 1
+    fi
 
     #########################################
     # Version
     #########################################
 
-    pct exec 121 -- syncthing --version \
-        > "$DEST/version.txt"
+    if ! pct exec 121 -- syncthing --version \
+        > "$DEST/version.txt"; then
+
+        echo "ERROR: Failed to export Syncthing version."
+        record_status "syncthing" "FAILED"
+        return 1
+    fi
 
     #########################################
     # Mount Information
     #########################################
 
-    pct exec 121 -- findmnt /data \
-        > "$DEST/mount.txt"
+    if ! pct exec 121 -- findmnt /data \
+        > "$DEST/mount.txt"; then
+
+        echo "ERROR: Failed to export Syncthing mount information."
+        record_status "syncthing" "FAILED"
+        return 1
+    fi
 
     #########################################
     # Generate README
@@ -211,5 +289,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "syncthing" "OK"
+    echo "Syncthing configuration exported successfully."
+
+    return 0
 }

@@ -2,28 +2,109 @@
 # Docker
 #########################################
 
+DOCKER_ENABLED=true
+DOCKER_DISABLED_REASON=""
+
 sync_docker() {
     local DEST="$REPO_DIR/configs/docker"
 
     echo "Syncing Docker config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$DOCKER_ENABLED" != "true" ]]; then
+        echo "Docker export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# Docker Configuration
+
+## Status
+
+Docker configuration export is currently **disabled**.
+
+**Reason:** $DOCKER_DISABLED_REASON
+
+No live Docker configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+DOCKER_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/docker.sh
+\`\`\`
+
+EOF
+
+        record_status "docker" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would copy Docker configuration"
         record_status "docker" "DRY"
-        return
+        return 0
     fi
 
-    mkdir -p "$DEST"
+    #########################################
+    # Container Check
+    #########################################
 
-    pct exec 100 -- bash -c '
+    if ! is_lxc_running 100; then
+        echo "ERROR: Docker container CT100 is not running."
+        record_status "docker" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Prepare Destination
+    #########################################
+
+    if ! mkdir -p "$DEST"; then
+        echo "ERROR: Failed to create Docker export directory."
+        record_status "docker" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Capture Version Information
+    #########################################
+
+    if ! pct exec 100 -- bash -c '
         docker --version
         docker compose version
         containerd --version
-    ' > "$DEST/versions.txt"
+    ' > "$DEST/versions.txt"; then
 
-    pct exec 100 -- bash -c '
+        echo "ERROR: Failed to capture Docker version information."
+        record_status "docker" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Capture Installed Packages
+    #########################################
+
+    if ! pct exec 100 -- bash -c '
         dpkg --get-selections | grep -E "docker|containerd|runc"
-    ' > "$DEST/packages.txt"
+    ' > "$DEST/packages.txt"; then
+
+        echo "ERROR: Failed to capture Docker package information."
+        record_status "docker" "FAILED"
+        return 1
+    fi
 
     #########################################
     # Generate README
@@ -130,5 +211,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "docker" "OK"
+    echo "Docker configuration exported successfully."
+
+    return 0
 }

@@ -26,7 +26,7 @@ Runtime data:
 The following configuration is exported to Git:
 
 - `default-jellyfin`
-- `service-override.conf`
+- `service-override.conf` (if present)
 - `config/`
 - `libraries.txt`
 

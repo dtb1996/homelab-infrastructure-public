@@ -2,36 +2,116 @@
 # Jellyfin
 #########################################
 
+JELLYFIN_ENABLED=true
+JELLYFIN_DISABLED_REASON=""
+
 sync_jellyfin() {
     local DEST="$REPO_DIR/configs/jellyfin"
 
     echo "Syncing Jellyfin config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$JELLYFIN_ENABLED" != "true" ]]; then
+        echo "Jellyfin export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# Jellyfin Configuration
+
+## Status
+
+Jellyfin configuration export is currently **disabled**.
+
+**Reason:** $JELLYFIN_DISABLED_REASON
+
+No live Jellyfin configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+JELLYFIN_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/jellyfin.sh
+\`\`\`
+
+EOF
+
+        record_status "jellyfin" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would copy Jellyfin configuration"
         record_status "jellyfin" "DRY"
-        return
+        return 0
     fi
 
-    mkdir -p "$DEST"
+    #########################################
+    # Container Check
+    #########################################
 
-    # Remove previous exported config directory
-    rm -rf "$DEST/config"
-
-    mkdir -p "$DEST/config"
-
-    # Jellyfin environment configuration
-    pct exec 101 -- cat /etc/default/jellyfin \
-        > "$DEST/default-jellyfin"
-
-    # Systemd override configuration
-    if pct exec 101 -- test -f /etc/systemd/system/jellyfin.service.d/jellyfin.service.conf; then
-        pct exec 101 -- cat /etc/systemd/system/jellyfin.service.d/jellyfin.service.conf \
-            > "$DEST/service-override.conf"
+    if ! is_lxc_running 101; then
+        echo "ERROR: Jellyfin container CT101 is not running."
+        record_status "jellyfin" "FAILED"
+        return 1
     fi
 
-    # Export Jellyfin configuration files
-    pct exec 101 -- tar \
+    #########################################
+    # Prepare Destination
+    #########################################
+
+    if ! mkdir -p "$DEST/config"; then
+        echo "ERROR: Failed to create Jellyfin export directory."
+        record_status "jellyfin" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Jellyfin Environment Configuration
+    #########################################
+
+    if ! pct exec 101 -- cat /etc/default/jellyfin \
+        > "$DEST/default-jellyfin"; then
+
+        echo "ERROR: Failed to export Jellyfin environment configuration."
+        record_status "jellyfin" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Systemd Override Configuration
+    #########################################
+
+    if pct exec 101 -- \
+        test -f /etc/systemd/system/jellyfin.service.d/jellyfin.service.conf; then
+
+        if ! pct exec 101 -- \
+            cat /etc/systemd/system/jellyfin.service.d/jellyfin.service.conf \
+            > "$DEST/service-override.conf"; then
+
+            echo "ERROR: Failed to export Jellyfin systemd override."
+            record_status "jellyfin" "FAILED"
+            return 1
+        fi
+    fi
+
+    #########################################
+    # Export Jellyfin Configuration
+    #########################################
+
+    if ! pct exec 101 -- tar \
         --exclude='./data' \
         --exclude='./cache' \
         --exclude='./logs' \
@@ -39,18 +119,34 @@ sync_jellyfin() {
         -C /etc/jellyfin \
         -cf - \
         . \
-    | tar -C "$DEST/config" -xf -
+    | tar -C "$DEST/config" -xf -; then
 
-    # Remove runtime files if present
+        echo "ERROR: Failed to export Jellyfin configuration."
+        record_status "jellyfin" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Remove Runtime Files
+    #########################################
+
     rm -rf \
         "$DEST/config/data" \
         "$DEST/config/cache" \
         "$DEST/config/logs"
 
-    # Capture media library mount structure
-    pct exec 101 -- bash -c \
+    #########################################
+    # Capture Media Library Structure
+    #########################################
+
+    if ! pct exec 101 -- bash -c \
         'find /media -maxdepth 2 -type d | sort' \
-        > "$DEST/libraries.txt"
+        > "$DEST/libraries.txt"; then
+
+        echo "ERROR: Failed to export Jellyfin library paths."
+        record_status "jellyfin" "FAILED"
+        return 1
+    fi
 
     #########################################
     # Generate README
@@ -85,7 +181,7 @@ Runtime data:
 The following configuration is exported to Git:
 
 - \`default-jellyfin\`
-- \`service-override.conf\`
+- \`service-override.conf\` (if present)
 - \`config/\`
 - \`libraries.txt\`
 
@@ -145,5 +241,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "jellyfin" "OK"
+    echo "Jellyfin configuration exported successfully."
+
+    return 0
 }

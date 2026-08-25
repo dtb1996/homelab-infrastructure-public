@@ -2,39 +2,134 @@
 # AdGuard
 #########################################
 
+ADGUARD_ENABLED=true
+ADGUARD_DISABLED_REASON=""
+
 sync_adguard() {
     local DEST="$REPO_DIR/configs/adguard"
 
     echo "Syncing AdGuard Home config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$ADGUARD_ENABLED" != "true" ]]; then
+        echo "AdGuard export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# AdGuard Configuration
+
+## Status
+
+AdGuard configuration export is currently **disabled**.
+
+**Reason:** $ADGUARD_DISABLED_REASON
+
+No live AdGuard configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+ADGUARD_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/adguard.sh
+\`\`\`
+
+EOF
+
+        record_status "adguard" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would copy AdGuard configuration"
         record_status "adguard" "DRY"
-        return
+        return 0
     fi
 
-    mkdir -p "$DEST"
+    #########################################
+    # Container Check
+    #########################################
 
-    # Copy main configuration
-    pct exec 110 -- \
+    if ! is_lxc_running 110; then
+        echo "ERROR: AdGuard Home container CT110 is not running."
+        record_status "adguard" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Prepare Destination
+    #########################################
+
+    if ! mkdir -p "$DEST"; then
+        echo "ERROR: Failed to create AdGuard export directory."
+        record_status "adguard" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Copy Main Configuration
+    #########################################
+
+    if ! pct exec 110 -- \
         cat /opt/AdGuardHome/AdGuardHome.yaml \
-        > "$DEST/AdGuardHome.yaml"
+        > "$DEST/AdGuardHome.yaml"; then
 
-    # Sanitize credentials
-    sed -Ei \
+        echo "ERROR: Failed to copy AdGuardHome.yaml."
+        record_status "adguard" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Sanitize Credentials
+    #########################################
+
+    if ! sed -Ei \
         -e 's/^([[:space:]]*password:).*/\1 CHANGE_ME/' \
-        "$DEST/AdGuardHome.yaml"
+        "$DEST/AdGuardHome.yaml"; then
 
-    # Copy systemd service definition
-    pct exec 110 -- \
+        echo "ERROR: Failed to sanitize AdGuardHome.yaml."
+        record_status "adguard" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Copy Systemd Service
+    #########################################
+
+    if ! pct exec 110 -- \
         cat /etc/systemd/system/AdGuardHome.service \
-        > "$DEST/AdGuardHome.service"
+        > "$DEST/AdGuardHome.service"; then
 
-    # Capture version information
-    pct exec 110 -- \
+        echo "ERROR: Failed to copy AdGuardHome.service."
+        record_status "adguard" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Capture Version Information
+    #########################################
+
+    if ! pct exec 110 -- \
         /opt/AdGuardHome/AdGuardHome --version \
-        > "$DEST/version.txt" || true
-    
+        > "$DEST/version.txt"; then
+
+        echo "ERROR: Failed to capture AdGuard Home version."
+        record_status "adguard" "FAILED"
+        return 1
+    fi
+
     #########################################
     # Generate README
     #########################################
@@ -75,6 +170,7 @@ The following configuration is exported to Git:
 
 - \`AdGuardHome.yaml\`
 - \`AdGuardHome.service\`
+- \`version.txt\`
 
 The exported configuration is intended to provide a human-readable
 and reproducible representation of the service configuration.
@@ -117,5 +213,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "adguard" "OK"
+    echo "AdGuard Home configuration exported successfully."
+
+    return 0
 }

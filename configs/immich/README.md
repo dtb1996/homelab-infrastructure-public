@@ -25,6 +25,7 @@ The following configuration is exported to Git:
 
 - `docker-compose.yml`
 - `.env.example`
+- `layout.txt`
 
 The exported files document the deployment configuration while
 omitting sensitive values and application data.

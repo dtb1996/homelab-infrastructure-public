@@ -33,6 +33,7 @@ The following configuration is exported to Git:
 
 - `AdGuardHome.yaml`
 - `AdGuardHome.service`
+- `version.txt`
 
 The exported configuration is intended to provide a human-readable
 and reproducible representation of the service configuration.

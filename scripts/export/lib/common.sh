@@ -28,7 +28,12 @@ copy_pct_file() {
 
     echo "Copying file: CT${ct}:${src}"
 
-    pct exec "$ct" -- cat "$src" > "$dest"
+    if ! pct exec "$ct" -- cat "$src" > "$dest"; then
+        echo "ERROR: Failed to copy CT${ct}:${src}"
+        return 1
+    fi
+
+    return 0
 }
 
 copy_pct_dir() {
@@ -40,9 +45,21 @@ copy_pct_dir() {
 
     echo "Copying directory: CT${ct}:${src}"
 
-    pct exec "$ct" -- \
+    if ! pct exec "$ct" -- \
         tar -C "$(dirname "$src")" -cf - "$(basename "$src")" \
-        | tar -C "$dest" -xf -
+        | tar -C "$dest" -xf -; then
+
+        echo "ERROR: Failed to copy CT${ct}:${src}"
+        return 1
+    fi
+
+    return 0
+}
+
+is_lxc_running() {
+    local CTID="$1"
+
+    pct status "$CTID" 2>/dev/null | grep -q "status: running"
 }
 
 #########################################
@@ -56,6 +73,8 @@ check_dependencies() {
             return 1
         fi
     done
+
+    return 0
 }
 
 #########################################

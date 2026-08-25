@@ -2,36 +2,135 @@
 # Proxmox
 #########################################
 
+PROXMOX_ENABLED=true
+PROXMOX_DISABLED_REASON=""
+
 sync_proxmox() {
     local DEST="$REPO_DIR/configs/proxmox"
 
     echo "Syncing Proxmox config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$PROXMOX_ENABLED" != "true" ]]; then
+        echo "Proxmox export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# Proxmox Configuration
+
+## Status
+
+Proxmox configuration export is currently **disabled**.
+
+**Reason:** $PROXMOX_DISABLED_REASON
+
+No live Proxmox configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+PROXMOX_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/proxmox.sh
+\`\`\`
+
+EOF
+
+        record_status "proxmox" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would sync Proxmox configuration"
         record_status "proxmox" "DRY"
-        return
+        return 0
     fi
 
-    mkdir -p "$DEST"
+    #########################################
+    # Prepare Destination
+    #########################################
 
-    # Configuration files
-    cp /etc/hosts "$DEST/hosts"
-    cp /etc/network/interfaces "$DEST/interfaces"
-    cp /etc/pve/storage.cfg "$DEST/storage.cfg"
-    cp /etc/pve/datacenter.cfg "$DEST/datacenter.cfg"
+    if ! mkdir -p "$DEST"; then
+        echo "ERROR: Failed to create Proxmox export directory."
+        record_status "proxmox" "FAILED"
+        return 1
+    fi
 
-    # Root crontab
+    #########################################
+    # Configuration Files
+    #########################################
+
+    if ! cp /etc/hosts "$DEST/hosts"; then
+        echo "ERROR: Failed to export /etc/hosts."
+        record_status "proxmox" "FAILED"
+        return 1
+    fi
+
+    if ! cp /etc/network/interfaces "$DEST/interfaces"; then
+        echo "ERROR: Failed to export network interfaces configuration."
+        record_status "proxmox" "FAILED"
+        return 1
+    fi
+
+    if ! cp /etc/pve/storage.cfg "$DEST/storage.cfg"; then
+        echo "ERROR: Failed to export storage.cfg."
+        record_status "proxmox" "FAILED"
+        return 1
+    fi
+
+    if ! cp /etc/pve/datacenter.cfg "$DEST/datacenter.cfg"; then
+        echo "ERROR: Failed to export datacenter.cfg."
+        record_status "proxmox" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Root Crontab
+    #########################################
+
     mkdir -p "$DEST/cron"
-    crontab -l > "$DEST/cron/root.crontab"
 
-    # LXC configurations
+    if ! crontab -l > "$DEST/cron/root.crontab"; then
+        echo "ERROR: Failed to export root crontab."
+        record_status "proxmox" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # LXC Configurations
+    #########################################
+
     mkdir -p "$DEST/lxc"
-    cp /etc/pve/lxc/*.conf "$DEST/lxc/" 2>/dev/null || true
 
-    # Installed packages inventory
-    dpkg-query -W -f='${binary:Package}\t${Version}\n' \
-        | sort > "$DEST/packages.txt"
+    if ! cp /etc/pve/lxc/*.conf "$DEST/lxc/"; then
+        echo "ERROR: Failed to export LXC configurations."
+        record_status "proxmox" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Installed Packages Inventory
+    #########################################
+
+    if ! dpkg-query -W -f='${binary:Package}\t${Version}\n' \
+        | sort > "$DEST/packages.txt"; then
+
+        echo "ERROR: Failed to export installed package inventory."
+        record_status "proxmox" "FAILED"
+        return 1
+    fi
 
     #########################################
     # Generate README
@@ -149,5 +248,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "proxmox" "OK"
+    echo "Proxmox configuration exported successfully."
+
+    return 0
 }

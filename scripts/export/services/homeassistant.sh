@@ -2,21 +2,87 @@
 # Home Assistant
 #########################################
 
+HOMEASSISTANT_ENABLED=true
+HOMEASSISTANT_DISABLED_REASON=""
+
 sync_homeassistant() {
     local DEST="$REPO_DIR/configs/homeassistant"
 
     echo "Syncing Home Assistant config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$HOMEASSISTANT_ENABLED" != "true" ]]; then
+        echo "Home Assistant export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# Home Assistant Configuration
+
+## Status
+
+Home Assistant configuration export is currently **disabled**.
+
+**Reason:** $HOMEASSISTANT_DISABLED_REASON
+
+No live Home Assistant configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+HOMEASSISTANT_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/homeassistant.sh
+\`\`\`
+
+EOF
+
+        record_status "homeassistant" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would copy Home Assistant configuration"
         record_status "homeassistant" "DRY"
-        return
+        return 0
     fi
 
-    mkdir -p "$DEST"
+    #########################################
+    # Container Check
+    #########################################
 
-    # Copy Home Assistant configuration files
-    pct exec 140 -- tar \
+    if ! is_lxc_running 140; then
+        echo "ERROR: Home Assistant container CT140 is not running."
+        record_status "homeassistant" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Prepare Destination
+    #########################################
+
+    if ! mkdir -p "$DEST"; then
+        echo "ERROR: Failed to create Home Assistant export directory."
+        record_status "homeassistant" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Copy Configuration
+    #########################################
+
+    if ! pct exec 140 -- tar \
         --exclude='./.storage' \
         --exclude='./.cache' \
         --exclude='./deps' \
@@ -34,7 +100,12 @@ sync_homeassistant() {
         blueprints \
         custom_components \
         www \
-    | tar -C "$DEST" -xf -
+    | tar -C "$DEST" -xf -; then
+
+        echo "ERROR: Failed to export Home Assistant configuration."
+        record_status "homeassistant" "FAILED"
+        return 1
+    fi
 
     #########################################
     # Generate README
@@ -67,6 +138,7 @@ The following configuration is exported to Git:
 - \`scripts.yaml\`
 - \`scenes.yaml\`
 - \`blueprints/\`
+- \`custom_components/\`
 - \`www/\`
 
 The exported configuration provides a sanitized representation of the
@@ -115,5 +187,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "homeassistant" "OK"
+    echo "Home Assistant configuration exported successfully."
+
+    return 0
 }

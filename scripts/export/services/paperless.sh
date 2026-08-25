@@ -2,24 +2,98 @@
 # Paperless
 #########################################
 
+PAPERLESS_ENABLED=true
+PAPERLESS_DISABLED_REASON=""
+
 sync_paperless() {
     local DEST="$REPO_DIR/configs/paperless"
 
     echo "Syncing Paperless config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$PAPERLESS_ENABLED" != "true" ]]; then
+        echo "Paperless export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# Paperless Configuration
+
+## Status
+
+Paperless configuration export is currently **disabled**.
+
+**Reason:** $PAPERLESS_DISABLED_REASON
+
+No live Paperless configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+PAPERLESS_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/paperless.sh
+\`\`\`
+
+EOF
+
+        record_status "paperless" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would copy Paperless configuration"
         record_status "paperless" "DRY"
-        return
+        return 0
     fi
 
-    copy_pct_file \
-        100 \
-        /opt/stacks/paperless/docker-compose.yml \
-        "$DEST/docker-compose.yml"
+    #########################################
+    # Container Check
+    #########################################
+
+    if ! is_lxc_running 100; then
+        echo "ERROR: Paperless container CT100 is not running."
+        record_status "paperless" "FAILED"
+        return 1
+    fi
 
     #########################################
-    # Create sanitized environment template
+    # Prepare Destination
+    #########################################
+
+    if ! mkdir -p "$DEST"; then
+        echo "ERROR: Failed to create Paperless export directory."
+        record_status "paperless" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Copy Docker Compose Configuration
+    #########################################
+
+    if ! copy_pct_file \
+        100 \
+        /opt/stacks/paperless/docker-compose.yml \
+        "$DEST/docker-compose.yml"; then
+
+        echo "ERROR: Failed to export Paperless docker-compose.yml."
+        record_status "paperless" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Create Sanitized Environment Template
     #########################################
 
     cat > "$DEST/.env.example" <<EOF
@@ -168,5 +242,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "paperless" "OK"
+    echo "Paperless configuration exported successfully."
+
+    return 0
 }

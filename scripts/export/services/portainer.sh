@@ -2,23 +2,95 @@
 # Portainer
 #########################################
 
+PORTAINER_ENABLED=true
+PORTAINER_DISABLED_REASON=""
+
 sync_portainer() {
     local DEST="$REPO_DIR/configs/portainer"
 
     echo "Syncing Portainer config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$PORTAINER_ENABLED" != "true" ]]; then
+        echo "Portainer export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# Portainer Configuration
+
+## Status
+
+Portainer configuration export is currently **disabled**.
+
+**Reason:** $PORTAINER_DISABLED_REASON
+
+No live Portainer configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+PORTAINER_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/portainer.sh
+\`\`\`
+
+EOF
+
+        record_status "portainer" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would copy Portainer configuration"
         record_status "portainer" "DRY"
-        return
+        return 0
     fi
 
-    mkdir -p "$DEST"
+    #########################################
+    # Container Check
+    #########################################
 
-    copy_pct_file \
+    if ! is_lxc_running 100; then
+        echo "ERROR: Portainer container CT100 is not running."
+        record_status "portainer" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Prepare Destination
+    #########################################
+
+    if ! mkdir -p "$DEST"; then
+        echo "ERROR: Failed to create Portainer export directory."
+        record_status "portainer" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Copy Docker Compose Configuration
+    #########################################
+
+    if ! copy_pct_file \
         100 \
         /opt/stacks/portainer/docker-compose.yml \
-        "$DEST/docker-compose.yml"
+        "$DEST/docker-compose.yml"; then
+
+        echo "ERROR: Failed to export Portainer docker-compose.yml."
+        record_status "portainer" "FAILED"
+        return 1
+    fi
 
     #########################################
     # Generate README
@@ -86,5 +158,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "portainer" "OK"
+    echo "Portainer configuration exported successfully."
+
+    return 0
 }

@@ -2,26 +2,100 @@
 # Samba
 #########################################
 
+SAMBA_ENABLED=true
+SAMBA_DISABLED_REASON=""
+
 sync_samba() {
     local DEST="$REPO_DIR/configs/samba"
 
     echo "Syncing Samba config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$SAMBA_ENABLED" != "true" ]]; then
+        echo "Samba export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# Samba Configuration
+
+## Status
+
+Samba configuration export is currently **disabled**.
+
+**Reason:** $SAMBA_DISABLED_REASON
+
+No live Samba configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+SAMBA_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/samba.sh
+\`\`\`
+
+EOF
+
+        record_status "samba" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would copy Samba configuration"
         record_status "samba" "DRY"
-        return
+        return 0
     fi
 
-    mkdir -p "$DEST"
+    #########################################
+    # Container Check
+    #########################################
 
-    # Copy Docker Compose file
-    copy_pct_file \
+    if ! is_lxc_running 100; then
+        echo "ERROR: Samba container CT100 is not running."
+        record_status "samba" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Prepare Destination
+    #########################################
+
+    if ! mkdir -p "$DEST"; then
+        echo "ERROR: Failed to create Samba export directory."
+        record_status "samba" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Copy Docker Compose File
+    #########################################
+
+    if ! copy_pct_file \
         100 \
         /opt/stacks/samba/docker-compose.yml \
-        "$DEST/docker-compose.yml"
+        "$DEST/docker-compose.yml"; then
 
-    # Create sanitized environment template
+        echo "ERROR: Failed to export Samba docker-compose.yml."
+        record_status "samba" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Create Sanitized Environment Template
+    #########################################
+
     cat > "$DEST/.env.example" <<EOF
 # Samba credentials
 
@@ -139,5 +213,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "samba" "OK"
+    echo "Samba configuration exported successfully."
+
+    return 0
 }

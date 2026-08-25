@@ -2,34 +2,130 @@
 # Homepage
 #########################################
 
+HOMEPAGE_ENABLED=true
+HOMEPAGE_DISABLED_REASON=""
+
 sync_homepage() {
     local DEST="$REPO_DIR/configs/homepage"
 
     echo "Syncing Homepage config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$HOMEPAGE_ENABLED" != "true" ]]; then
+        echo "Homepage export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# Homepage Configuration
+
+## Status
+
+Homepage configuration export is currently **disabled**.
+
+**Reason:** $HOMEPAGE_DISABLED_REASON
+
+No live Homepage configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+HOMEPAGE_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/homepage.sh
+\`\`\`
+
+EOF
+
+        record_status "homepage" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would copy Homepage configuration"
         record_status "homepage" "DRY"
-        return
+        return 0
     fi
 
-    copy_pct_file \
+    #########################################
+    # Container Check
+    #########################################
+
+    if ! is_lxc_running 100; then
+        echo "ERROR: Homepage container CT100 is not running."
+        record_status "homepage" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Prepare Destination
+    #########################################
+
+    if ! mkdir -p "$DEST"; then
+        echo "ERROR: Failed to create Homepage export directory."
+        record_status "homepage" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Copy Docker Compose Configuration
+    #########################################
+
+    if ! copy_pct_file \
         100 \
         /opt/stacks/homepage/docker-compose.yml \
-        "$DEST/docker-compose.yml"
+        "$DEST/docker-compose.yml"; then
 
-    copy_pct_dir \
+        echo "ERROR: Failed to export Homepage docker-compose.yml."
+        record_status "homepage" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Copy Homepage Configuration
+    #########################################
+
+    if ! copy_pct_dir \
         100 \
         /opt/stacks/homepage/config \
-        "$DEST"
+        "$DEST"; then
+
+        echo "ERROR: Failed to export Homepage configuration."
+        record_status "homepage" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Remove Runtime Logs
+    #########################################
 
     rm -rf "$DEST/config/logs"
 
+    #########################################
+    # Sanitize Proxmox Credentials
+    #########################################
+
     if [[ -f "$DEST/config/proxmox.yaml" ]]; then
-        sed -Ei \
+        if ! sed -Ei \
             -e 's/^([[:space:]]*token:).*/\1 <REDACTED>/' \
             -e 's/^([[:space:]]*secret:).*/\1 <REDACTED>/' \
-            "$DEST/config/proxmox.yaml"
+            "$DEST/config/proxmox.yaml"; then
+
+            echo "ERROR: Failed to sanitize Homepage Proxmox credentials."
+            record_status "homepage" "FAILED"
+            return 1
+        fi
     fi
 
     #########################################
@@ -115,5 +211,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "homepage" "OK"
+    echo "Homepage configuration exported successfully."
+
+    return 0
 }

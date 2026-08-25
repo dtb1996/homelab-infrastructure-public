@@ -2,25 +2,97 @@
 # Caddy
 #########################################
 
+CADDY_ENABLED=true
+CADDY_DISABLED_REASON=""
+
 sync_caddy() {
     local DEST="$REPO_DIR/configs/caddy"
 
     echo "Syncing Caddy config..."
 
+    #########################################
+    # Disabled
+    #########################################
+
+    if [[ "$CADDY_ENABLED" != "true" ]]; then
+        echo "Caddy export disabled; skipping."
+
+        mkdir -p "$DEST"
+
+        cat > "$DEST/README.md" <<EOF
+# Caddy Configuration
+
+## Status
+
+Caddy configuration export is currently **disabled**.
+
+**Reason:** $CADDY_DISABLED_REASON
+
+No live Caddy configuration is synchronized to this directory.
+
+To re-enable the export, set:
+
+\`\`\`
+CADDY_ENABLED=true
+\`\`\`
+
+in:
+
+\`\`\`
+scripts/services/caddy.sh
+\`\`\`
+
+EOF
+
+        record_status "caddy" "DISABLED"
+        return 0
+    fi
+
+    #########################################
+    # Dry Run
+    #########################################
+
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would copy Caddy configuration"
         record_status "caddy" "DRY"
-        return
+        return 0
     fi
 
-    mkdir -p "$DEST"
+    #########################################
+    # Container Check
+    #########################################
 
-    pct exec 120 -- \
+    if ! is_lxc_running 120; then
+        echo "ERROR: Caddy container CT120 is not running."
+        record_status "caddy" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Prepare Destination
+    #########################################
+
+    if ! mkdir -p "$DEST"; then
+        echo "ERROR: Failed to create Caddy export directory."
+        record_status "caddy" "FAILED"
+        return 1
+    fi
+
+    #########################################
+    # Copy Configuration
+    #########################################
+
+    if ! pct exec 120 -- \
         tar \
         -C /etc/caddy \
         -cf - \
         sites snippets Caddyfile \
-        | tar -C "$DEST" -xf -
+        | tar -C "$DEST" -xf -; then
+
+        echo "ERROR: Failed to export Caddy configuration."
+        record_status "caddy" "FAILED"
+        return 1
+    fi
 
     #########################################
     # Generate README
@@ -110,5 +182,12 @@ The README is regenerated during each configuration export.
 
 EOF
 
+    #########################################
+    # Success
+    #########################################
+
     record_status "caddy" "OK"
+    echo "Caddy configuration exported successfully."
+
+    return 0
 }
