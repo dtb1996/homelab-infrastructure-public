@@ -339,7 +339,7 @@ libncursesw6:amd64	6.5+20250216-2
 libnet1:amd64	1.3+dfsg-2
 libnetaddr-ip-perl	4.079+dfsg-2+b5
 libnet-dbus-perl	1.2.0-2+b3
-libnet-dns-perl	1.50-1
+libnet-dns-perl	1.56-0+deb13u1
 libnetfilter-conntrack3:amd64	1.1.0-1
 libnetfilter-log1:amd64	1.0.2-4+b1
 libnet-http-perl	6.23-1
@@ -367,7 +367,7 @@ libnss3:amd64	2:3.110-1+deb13u4
 libnss-systemd:amd64	257.13-1~deb13u1
 libnuma1:amd64	2.0.19-1
 libnutscan2:amd64	2.8.1-5
-libnvpair3linux:amd64	2.4.3-pve1
+libnvpair3linux:amd64	2.4.4-pve1
 liboath0t64:amd64	2.6.12-1
 libogg0:amd64	1.3.5-3+b2
 libopeniscsiusr	2.1.11-1+deb13u2
@@ -407,7 +407,7 @@ libproxmox-rs-perl	0.4.1
 libpsl5t64:amd64	0.21.2-1.1+b1
 libpulse0:amd64	17.0+dfsg1-2+b1
 libpve-access-control	9.1.1
-libpve-apiclient-perl	3.4.2
+libpve-apiclient-perl	3.4.3
 libpve-cluster-api-perl	9.1.6
 libpve-cluster-perl	9.1.6
 libpve-common-perl	9.2.1
@@ -417,7 +417,7 @@ libpve-network-api-perl	1.6.7
 libpve-network-perl	1.6.7
 libpve-notify-perl	9.1.6
 libpve-rs-perl	0.15.3
-libpve-storage-perl	9.1.8
+libpve-storage-perl	9.1.10
 libpython3.13-minimal:amd64	3.13.5-2+deb13u4
 libpython3.13-stdlib:amd64	3.13.5-2+deb13u4
 libpython3-stdlib:amd64	3.13.5-1
@@ -430,7 +430,7 @@ libqt5network5t64:amd64	5.15.15+dfsg-6+deb13u1
 libquorum5:amd64	3.1.10-pve3
 librabbitmq4:amd64	0.15.0-1+deb13u2
 librados2	19.2.3-pve4
-librados2-perl	1.5.0
+librados2-perl	1.5.1
 libradosstriper1	19.2.3-pve4
 librbd1	19.2.3-pve4
 librdkafka1:amd64	2.8.0-1
@@ -464,7 +464,7 @@ libspice-server1:amd64	0.15.2-1+b1
 libsqlite3-0:amd64	3.46.1-7+deb13u1
 libss2:amd64	1.47.2-3+b11
 libssh2-1t64:amd64	1.11.1-1+deb13u1
-libssl3t64:amd64	3.5.6-1~deb13u2
+libssl3t64:amd64	3.5.7-1~deb13u2
 libstatgrab10t64	0.92.1-1.2
 libstdc++6:amd64	14.2.0-19
 libstring-shellquote-perl	1.04-3
@@ -507,7 +507,7 @@ libusbmuxd-2.0-7:amd64	2.1.0-1+b1
 libusbredirparser1t64:amd64	0.15.0-1
 libuuid1:amd64	2.41.5-0+deb13u1
 libuuid-perl	0.37-1
-libuutil3linux:amd64	2.4.3-pve1
+libuutil3linux:amd64	2.4.4-pve1
 libuv1t64:amd64	1.50.0-2
 libva2:amd64	2.22.0-3
 libva-drm2:amd64	2.22.0-3
@@ -553,8 +553,8 @@ libyaml-0-2:amd64	0.2.5-2
 libyaml-libyaml-perl	0.903.0+ds-1
 libyang3:amd64	3.12.2-1
 libz3-4:amd64	4.13.3-1
-libzfs7linux:amd64	2.4.3-pve1
-libzpool7linux:amd64	2.4.3-pve1
+libzfs7linux:amd64	2.4.4-pve1
+libzpool7linux:amd64	2.4.4-pve1
 libzstd1:amd64	1.5.7+dfsg-1
 linux-base	4.12.1
 linux-sysctl-defaults	4.12.1
@@ -597,8 +597,8 @@ open-iscsi	2.1.11-1+deb13u2
 openssh-client	1:10.0p1-7+deb13u4
 openssh-server	1:10.0p1-7+deb13u4
 openssh-sftp-server	1:10.0p1-7+deb13u4
-openssl	3.5.6-1~deb13u2
-openssl-provider-legacy	3.5.6-1~deb13u2
+openssl	3.5.7-1~deb13u2
+openssl-provider-legacy	3.5.7-1~deb13u2
 passwd	1:4.17.4-2
 patch	2.8-2
 pci.ids	0.0~2025.06.09-1
@@ -621,10 +621,11 @@ proxmox-enterprise-support-keyring	1.1
 proxmox-firewall	1.2.3
 proxmox-kernel-7.0.14-11-pve-signed	7.0.14-11
 proxmox-kernel-7.0.14-12-pve-signed	7.0.14-12
+proxmox-kernel-7.0.14-14-pve-signed	7.0.14-14
 proxmox-kernel-7.0.14-4-pve-signed	7.0.14-4
 proxmox-kernel-7.0.14-8-pve-signed	7.0.14-8
 proxmox-kernel-7.0.2-6-pve-signed	7.0.2-6
-proxmox-kernel-7.0	7.0.14-12
+proxmox-kernel-7.0	7.0.14-14
 proxmox-kernel-helper	9.2.0
 proxmox-mail-forward	1.0.3
 proxmox-mini-journalreader	1.7
@@ -644,13 +645,13 @@ pve-edk2-firmware-legacy	4.2025.05-3
 pve-edk2-firmware-ovmf	4.2025.05-3
 pve-esxi-import-tools	1.0.1
 pve-firewall	6.0.5
-pve-firmware	3.18-5
+pve-firmware	3.18-6
 pve-ha-manager	5.2.5
 pve-i18n	3.10.0
 pve-lxc-syscalld	2.0.2
 pve-manager	9.2.11
 pve-nvidia-vgpu-helper	0.3.1
-pve-qemu-kvm	11.0.3-2
+pve-qemu-kvm	11.0.3-3
 pve-xtermjs	6.0.0-2
 pve-yew-mobile-gui	0.8.0
 pve-yew-mobile-i18n	3.10.0
@@ -700,7 +701,7 @@ python3-wcwidth	0.2.13+dfsg1-1
 python3-yaml	6.0.2-1+b2
 python3-zipp	3.21.0-1
 python-apt-common	3.0.0
-qemu-server	9.2.6
+qemu-server	9.2.7
 qrencode	4.1.1-2
 readline-common	8.2-6
 reportbug	13.2.0
@@ -766,8 +767,8 @@ xkb-data	2.42-1
 xml-core	0.19
 xsltproc	1.1.35-1.2+deb13u3
 xz-utils	5.8.1-1+deb13u1
-zfs-initramfs	2.4.3-pve1
-zfsutils-linux	2.4.3-pve1
-zfs-zed	2.4.3-pve1
+zfs-initramfs	2.4.4-pve1
+zfsutils-linux	2.4.4-pve1
+zfs-zed	2.4.4-pve1
 zlib1g:amd64	1:1.3.dfsg+really1.3.1-1+b1
 zstd	1.5.7+dfsg-1

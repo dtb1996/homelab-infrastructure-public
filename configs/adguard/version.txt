@@ -1,1 +1,1 @@
-AdGuard Home, version v0.107.78
+AdGuard Home, version v0.107.79
