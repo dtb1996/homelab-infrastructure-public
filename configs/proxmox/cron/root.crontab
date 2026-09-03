@@ -23,7 +23,7 @@
 # m h  dom mon dow   command
 
 # Nightly complete homelab backup
-0 2 * * * /srv/homelab-git/scripts/backup/backup-all.sh
+0 2 * * * /srv/homelab-infrastructure/scripts/backup/backup-all.sh
 
 # Export infrastructure configuration to Git
-30 3 * * * AUTO_COMMIT=true /srv/homelab-git/scripts/export/export-configs.sh
+30 3 * * * AUTO_COMMIT=true /srv/homelab-infrastructure/scripts/export/export-configs.sh

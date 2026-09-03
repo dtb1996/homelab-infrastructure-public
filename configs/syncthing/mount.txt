@@ -1,2 +1,2 @@
 TARGET SOURCE                       FSTYPE OPTIONS
-/data  /dev/sdd1[/shared/syncthing] ext4   rw,relatime
+/data  /dev/sda1[/shared/syncthing] ext4   rw,relatime

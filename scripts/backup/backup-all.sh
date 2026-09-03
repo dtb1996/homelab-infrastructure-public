@@ -4,7 +4,7 @@ set -euo pipefail
 #########################################
 # Backup Orchestrator
 #
-# Version: 1.6
+# Version: 1.7
 #########################################
 
 VERSION="1.6"
@@ -167,7 +167,7 @@ run_backup \
     "$SCRIPT_DIR/backup-paperless.sh"
 
 run_backup \
-    "HDD to USB backup mirror" \
+    "SSD to USB backup mirror" \
     "$SCRIPT_DIR/mirror-backups.sh"
 
 #########################################

@@ -4,7 +4,7 @@ set -euo pipefail
 #########################################
 # Docker Configuration Backup
 #
-# Version: 1.2
+# Version: 1.3
 #
 # Backs up:
 #   - Docker Compose stacks
@@ -118,7 +118,7 @@ tar -czf /tmp/docker-config.tar.gz \
 
 pct pull "$CTID" /tmp/docker-config.tar.gz "$ARCHIVE"
 
-pct exec "$CTID" -- rm -f /tmp/docker-config.tar.gz
+pct exec "$CTID" -- rm -f /tmp/docker-config.tar.gz || true
 
 log "Created archive: $(basename "$ARCHIVE")"
 

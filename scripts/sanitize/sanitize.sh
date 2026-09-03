@@ -5,7 +5,7 @@ set -euo pipefail
 #
 # Homelab Public Repository Sanitizer
 #
-# Version: 1.2
+# Version: 1.3
 #
 # Copies the private homelab repository
 # to a separate public repository directory
@@ -25,8 +25,8 @@ VERSION="1.2"
 # Configuration
 #########################################
 
-SOURCE_DIR="/srv/homelab-git"
-PUBLIC_DIR="/srv/homelab-git-public"
+SOURCE_DIR="/srv/homelab-infrastructure"
+PUBLIC_DIR="/srv/homelab-infrastructure-public"
 SCRIPT_DIR="${SOURCE_DIR}/scripts/sanitize"
 
 #########################################

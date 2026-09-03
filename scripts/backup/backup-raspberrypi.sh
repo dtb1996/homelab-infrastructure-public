@@ -5,7 +5,7 @@ set -euo pipefail
 #
 # Raspberry Pi Backup Pull
 #
-# Version: 1.2
+# Version: 1.3
 #
 # Pulls:
 # - Raspberry Pi configuration backups
@@ -27,10 +27,11 @@ LOG_DIR="$BASE/logs"
 LOGFILE="$LOG_DIR/raspberrypi-backup.log"
 export LOGFILE
 
-source /srv/homelab-git/scripts/backup/lib/backup-common.sh
+source /srv/homelab-infrastructure/scripts/backup/lib/backup-common.sh
 
 PI_USER="root"
 PI_HOST="192.0.2.50"
+SSH_OPTS=(-i /root/.ssh/id_ed25519_raspberrypi_backup -o IdentitiesOnly=yes)
 
 REMOTE_DIR="/root/backups/raspberrypi"
 
@@ -87,7 +88,7 @@ backup_header "Raspberry Pi"
 
 log "Testing SSH connectivity..."
 
-if ! ssh \
+if ! ssh "${SSH_OPTS[@]}" \
     -o BatchMode=yes \
     -o ConnectTimeout=10 \
     "$PI_USER@$PI_HOST" \
@@ -101,7 +102,7 @@ fi
 # Verify backup exists remotely
 #########################################
 
-if ! ssh "$PI_USER@$PI_HOST" \
+if ! ssh "${SSH_OPTS[@]}" "$PI_USER@$PI_HOST" \
     "test -d '$REMOTE_DIR'"
 then
     log "ERROR: Remote backup directory not found."
@@ -114,7 +115,7 @@ fi
 
 log "Remote backup usage:"
 
-ssh "$PI_USER@$PI_HOST" \
+ssh "${SSH_OPTS[@]}" "$PI_USER@$PI_HOST" \
     "du -sh '$REMOTE_DIR'"
 
 #########################################
@@ -124,6 +125,7 @@ ssh "$PI_USER@$PI_HOST" \
 log "Syncing Raspberry Pi backups..."
 
 if ! rsync -aH --delete --stats \
+    -e "ssh -i /root/.ssh/id_ed25519_raspberrypi_backup -o IdentitiesOnly=yes" \
     "$PI_USER@$PI_HOST:$REMOTE_DIR/" \
     "$BASE/"
 then
@@ -141,7 +143,7 @@ then
     exit 1
 fi
 
-# Log the sychronized archive count
+# Log the synchronized archive count
 ARCHIVE_COUNT=$(find "$ARCHIVE_DIR" -name "*.tar.gz" | wc -l)
 
 log "Archives available: $ARCHIVE_COUNT"
@@ -154,25 +156,25 @@ INV="$INVENTORY_DIR/$DATE"
 
 mkdir -p "$INV"
 
-ssh "$PI_USER@$PI_HOST" hostname \
+ssh "${SSH_OPTS[@]}" "$PI_USER@$PI_HOST" hostname \
     > "$INV/hostname.txt"
 
-ssh "$PI_USER@$PI_HOST" uname -a \
+ssh "${SSH_OPTS[@]}" "$PI_USER@$PI_HOST" uname -a \
     > "$INV/uname.txt"
 
-ssh "$PI_USER@$PI_HOST" df -h \
+ssh "${SSH_OPTS[@]}" "$PI_USER@$PI_HOST" df -h \
     > "$INV/df.txt"
 
-ssh "$PI_USER@$PI_HOST" free -h \
+ssh "${SSH_OPTS[@]}" "$PI_USER@$PI_HOST" free -h \
     > "$INV/memory.txt"
 
-ssh "$PI_USER@$PI_HOST" systemctl list-units --type=service \
+ssh "${SSH_OPTS[@]}" "$PI_USER@$PI_HOST" systemctl list-units --type=service \
     > "$INV/services.txt"
 
-ssh "$PI_USER@$PI_HOST" cat /etc/os-release \
+ssh "${SSH_OPTS[@]}" "$PI_USER@$PI_HOST" cat /etc/os-release \
     > "$INV/os-release.txt"
 
-ssh "$PI_USER@$PI_HOST" vcgencmd version 2>/dev/null \
+ssh "${SSH_OPTS[@]}" "$PI_USER@$PI_HOST" vcgencmd version 2>/dev/null \
     > "$INV/firmware.txt" || true
 
 cat > "$INV/README.txt" <<EOF

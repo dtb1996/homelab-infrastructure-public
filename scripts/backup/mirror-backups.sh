@@ -4,10 +4,10 @@ set -euo pipefail
 #########################################
 # Backup Mirror
 #
-# Version: 2.2
+# Version: 2.3
 #
 # Mirrors the primary backup repository
-# from the HDD to the USB backup drive.
+# from the SSD to the USB backup drive.
 #########################################
 
 VERSION="2.2"

@@ -1,5 +1,5 @@
 127.0.0.1 localhost.localdomain localhost
-192.0.2.10 proxmox.example.com proxmox
+192.168.0.42 pve-01.homelab.local pve-01
 
 # The following lines are desirable for IPv6 capable hosts
 

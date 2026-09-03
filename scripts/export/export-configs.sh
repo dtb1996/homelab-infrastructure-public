@@ -4,13 +4,13 @@ set -euo pipefail
 #########################################
 # Homelab Configs Exporter
 #
-# Version: 2.0
+# Version: 2.1
 #########################################
 
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_DIR="/srv/homelab-git"
+REPO_DIR="/srv/homelab-infrastructure"
 
 DRY_RUN="${DRY_RUN:-false}"
 AUTO_COMMIT="${AUTO_COMMIT:-false}"
