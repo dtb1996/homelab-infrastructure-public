@@ -64,6 +64,7 @@ e2fsprogs	1.47.2-3+b11
 ebtables	2.0.11-6
 efibootmgr	18-2
 eject	2.41.5-0+deb13u1
+etherwake	1.09-5
 ethtool	1:6.14.2-1
 faketime	0.9.10+2024-06-05+gba9ed5b2-0.6
 fdisk	2.41.5-0+deb13u1
@@ -712,6 +713,8 @@ systemd-boot-efi:amd64	257.13-1~deb13u1
 systemd-boot-tools	257.13-1~deb13u1
 systemd-sysv	257.13-1~deb13u1
 sysvinit-utils	3.14-4
+tailscale	1.102.3
+tailscale-archive-keyring	1.35.181
 tar	1.35+dfsg-3.1
 tcpdump	4.99.5-2
 thin-provisioning-tools	1.1.0-4+b1
@@ -729,6 +732,7 @@ vim-common	2:9.1.1230-2
 vim-tiny	2:9.1.1230-2
 virtiofsd	1.13.2-1+deb13u1
 vncterm	1.9.2
+wakeonlan	0.41-14
 wamerican	2020.12.07-4
 wget	1.25.0-2
 whiptail	0.52.25-1
