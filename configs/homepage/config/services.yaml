@@ -35,6 +35,10 @@
         icon: home-assistant.svg
         href: https://ha.example.com
         description: Home automation
+    - Open WebUI:
+        icon: open-webui.svg
+        href: https://ai.example.com
+        description: LLM Frontend
     - Router:
         icon: tp-link.svg
         href: http://router.example.com
@@ -53,6 +57,12 @@
             type: syncthing
             url: https://sync.example.com
             key: "{{HOMEPAGE_VAR_SYNCTHING_API_KEY}}"
+
+- Utilities:
+    - BentoPDF:
+        icon: bentopdf.svg
+        href: https://pdf.example.com
+        description: PDF Tools
 
 - Monitoring:
     - Uptime Kuma:

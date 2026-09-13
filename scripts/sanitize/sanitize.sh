@@ -5,7 +5,7 @@ set -euo pipefail
 #
 # Homelab Public Repository Sanitizer
 #
-# Version: 1.3
+# Version: 1.4
 #
 # Copies the private homelab repository
 # to a separate public repository directory
@@ -19,7 +19,7 @@ set -euo pipefail
 #
 #########################################
 
-VERSION="1.2"
+VERSION="1.4"
 
 #########################################
 # Configuration
@@ -53,6 +53,7 @@ declare -A IP_REPLACEMENTS=(
     ["192.0.2.91"]="192.0.2.91"
     ["192.0.2.92"]="192.0.2.92"
     ["192.0.2.0"]="192.0.2.0"
+    ["192.0.2.44"]="192.0.2.44"
 )
 
 declare -A EMAIL_REPLACEMENTS=(
