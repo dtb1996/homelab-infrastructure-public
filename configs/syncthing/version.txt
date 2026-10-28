@@ -1,1 +1,1 @@
-syncthing v2.1.6 "Hafnium Hornet" (go1.27.1 linux-amd64) debian@github.syncthing.net 2026-10-05 04:03:55 UTC [noupgrade]
+syncthing v2.1.7 "Hafnium Hornet" (go1.27.3 linux-amd64) debian@github.syncthing.net 2026-10-20 19:54:38 UTC [noupgrade]

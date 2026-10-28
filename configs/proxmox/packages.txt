@@ -8,9 +8,9 @@ base-passwd	3.6.7
 bash	5.2.37-2+b10
 bash-completion	1:2.16.0-7
 bc	1.07.1-4
-bind9-dnsutils	1:9.20.29-1~deb13u1
-bind9-host	1:9.20.29-1~deb13u1
-bind9-libs:amd64	1:9.20.29-1~deb13u1
+bind9-dnsutils	1:9.20.30-1~deb13u1
+bind9-host	1:9.20.30-1~deb13u1
+bind9-libs:amd64	1:9.20.30-1~deb13u1
 binutils	2.44-3
 binutils-common:amd64	2.44-3
 binutils-x86-64-linux-gnu	2.44-3
@@ -21,11 +21,11 @@ bsdutils	1:2.41.5-0+deb13u1
 btrfs-progs	6.14-1
 busybox	1:1.37.0-6+b9
 bzip2	1.0.8-6
-ca-certificates	20250419
+ca-certificates	20250419+deb13u1
 ceph-common	19.2.6-pve4
 ceph-fuse	19.2.6-pve4
 chrony	4.8-4~bpo13+2
-cifs-utils	2:7.4-1+deb13u1
+cifs-utils	2:7.4-1+deb13u2
 conntrack	1:1.4.8-2
 console-setup	1.242~deb13u1
 console-setup-linux	1.242~deb13u1
@@ -157,7 +157,7 @@ libbinutils:amd64	2.44-3
 libblas3:amd64	3.12.1-6
 libblkid1:amd64	2.41.5-0+deb13u1
 libbpf1:amd64	1:1.5.0-3
-libbrotli1:amd64	1.1.0-2+b7
+libbrotli1:amd64	1.1.0-2+deb13u1
 libbsd0:amd64	0.12.2-2
 libbytes-random-secure-perl	0.29-4~deb13u1
 libbz2-1.0:amd64	1.0.8-6
@@ -483,7 +483,7 @@ libtry-tiny-perl	0.32-1
 libtypes-serialiser-perl	1.01-1
 libuchardet0:amd64	0.0.8-1+b2
 libudev1:amd64	257.13-1~deb13u1
-libunbound8:amd64	1.26.1-0+deb13u1
+libunbound8:amd64	1.26.2-0+deb13u1
 libunistring5:amd64	1.3-2
 libunwind8:amd64	1.8.1-0.1
 liburcu8t64:amd64	0.15.2-2
@@ -613,8 +613,9 @@ proxmox-kernel-7.0.14-19-pve-signed	7.0.14-19
 proxmox-kernel-7.0.14-20-pve-signed	7.0.14-20
 proxmox-kernel-7.0.14-23-pve-signed	7.0.14-23
 proxmox-kernel-7.0.14-24-pve-signed	7.0.14-24
+proxmox-kernel-7.0.14-25-pve-signed	7.0.14-25
 proxmox-kernel-7.0.2-6-pve-signed	7.0.2-6
-proxmox-kernel-7.0	7.0.14-24
+proxmox-kernel-7.0	7.0.14-25
 proxmox-kernel-helper	9.2.0
 proxmox-mail-forward	1.0.3
 proxmox-mini-journalreader	1.7
@@ -725,7 +726,7 @@ systemd-boot-efi:amd64	257.13-1~deb13u1
 systemd-boot-tools	257.13-1~deb13u1
 systemd-sysv	257.13-1~deb13u1
 sysvinit-utils	3.14-4
-tailscale	1.104.1
+tailscale	1.104.2
 tailscale-archive-keyring	1.35.181
 tar	1.35+dfsg-3.1
 tcpdump	4.99.5-2
@@ -733,7 +734,7 @@ thin-provisioning-tools	1.1.0-4+b1
 time	1.9-0.2
 traceroute	1:2.1.6-1
 tree	2.2.1-1
-tzdata	2026c-0+deb13u1
+tzdata	2026e-0+deb13u1
 ucf	3.0052
 udev	257.13-1~deb13u1
 uidmap	1:4.17.4-2
